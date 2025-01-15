@@ -4,19 +4,22 @@ from spade.message import Message
 
 class LightAgent(Agent):
     class RespondBehaviour(CyclicBehaviour):
+        def __init__(self):
+            super().__init__()
+            self.room_states = {}  # Dictionary to track the state of lights in rooms
+
         async def run(self):
             msg = await self.receive(timeout=10)  # Wait for a message
             if msg:
                 print(f"LightAgent received: {msg.body}")
-                # Respond based on the message body
-                if "Turn on the light" in msg.body:
-                    reply = Message(to=str(msg.sender))
-                    reply.body = "The light is now ON!"
-                    await self.send(reply)
-                elif "Turn off the light" in msg.body:
-                    reply = Message(to=str(msg.sender))
-                    reply.body = "The light is now OFF!"
-                    await self.send(reply)
+                if "entered" in msg.body:
+                    room = msg.body.split(" ")[-1]
+                    self.room_states[room] = "ON"
+                    print(f"Light in {room} turned ON.")
+                elif "exited" in msg.body:
+                    room = msg.body.split(" ")[-1]
+                    self.room_states[room] = "OFF"
+                    print(f"Light in {room} turned OFF.")
 
     async def setup(self):
         print(f"LightAgent {self.jid} is online.")

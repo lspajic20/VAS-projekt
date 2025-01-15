@@ -1,30 +1,32 @@
 from spade.agent import Agent
-from spade.behaviour import OneShotBehaviour, CyclicBehaviour
+from spade.behaviour import CyclicBehaviour
 from spade.message import Message
+import random
 import asyncio
 
 class PersonAgent(Agent):
-    class SendMessageBehaviour(OneShotBehaviour):
+    class MoveBehaviour(CyclicBehaviour):
         async def run(self):
-            print("Waiting for the agent to be ready...")
-            while not self.agent.client.is_connected():  
-                await asyncio.sleep(1)
-            print("Agent is ready. Sending a message to LightAgent...")
-            
-            msg = Message(to="agent1svjetlo@jabber.cz") 
-            msg.body = "Turn on the light"
-            await self.send(msg)
-            print("Message sent!")
+            rooms = ["Living Room", "Kitchen", "Hallway"]
+            current_room = random.choice(rooms)
+            print(f"Person entered {current_room}")
 
-    class ReceiveMessageBehaviour(CyclicBehaviour):
-        async def run(self):
-            msg = await self.receive(timeout=10) 
-            if msg:
-                print(f"PersonAgent received: {msg.body}") 
+            # Send a message to LightAgent
+            msg = Message(to="agent1svjetlo@jabber.cz")  
+            msg.body = f"Person entered {current_room}"
+            await self.send(msg)
+
+            # Simulate staying in the room for a few seconds
+            await asyncio.sleep(random.randint(2, 5))
+
+            # Send a message about exiting the room
+            print(f"Person exited {current_room}")
+            msg.body = f"Person exited {current_room}"
+            await self.send(msg)
+
+            await asyncio.sleep(random.randint(2, 5))  # Wait before moving again
 
     async def setup(self):
         print(f"PersonAgent {self.jid} is online.")
-        send_behaviour = self.SendMessageBehaviour()
-        self.add_behaviour(send_behaviour)
-        receive_behaviour = self.ReceiveMessageBehaviour()
-        self.add_behaviour(receive_behaviour)
+        move_behaviour = self.MoveBehaviour()
+        self.add_behaviour(move_behaviour)

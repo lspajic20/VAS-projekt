@@ -3,9 +3,11 @@ from agent_light import LightAgent
 from agent_person import PersonAgent
 
 async def main():
+    # Initialize agents
     light_agent = LightAgent("agent1svjetlo@jabber.cz", "agent12025")
     person_agent = PersonAgent("agent2osoba@jabber.cz", "agent22025")
 
+    # Start agents
     await light_agent.start()
     await person_agent.start()
 
