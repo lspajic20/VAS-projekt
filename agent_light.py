@@ -3,6 +3,7 @@ from spade.behaviour import CyclicBehaviour
 from spade.message import Message
 import asyncio
 import time
+import csv
 
 class LightAgent(Agent):
     class RespondBehaviour(CyclicBehaviour):
@@ -49,11 +50,24 @@ class LightAgent(Agent):
         async def run(self):
             await asyncio.sleep(30)  # Report every 30 seconds
             print("\n--- Energy and Time ON Report ---")
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Prepare data for saving
+            report_data = []
             for room in self.agent.behaviours[0].energy_usage.keys():
                 total_energy = self.agent.behaviours[0].energy_usage.get(room, 0)
                 total_time = self.agent.behaviours[0].total_on_time.get(room, 0)
+                report_data.append([timestamp, room, total_energy, total_time])
                 print(f"Room: {room}, Total Energy: {total_energy:.2f}W, Total ON Time: {total_time:.2f}s")
-            print("--------------------------------\n")
+
+            # Save to CSV
+            with open("energy_log.csv", "a", newline="") as file:
+                writer = csv.writer(file)
+                if file.tell() == 0:  # Write header only if file is empty
+                    writer.writerow(["Timestamp", "Room", "Total Energy (W)", "Total ON Time (s)"])
+                writer.writerows(report_data)
+
+            print("Report saved to energy_log.csv")
 
     async def setup(self):
         print(f"LightAgent {self.jid} is online.")
