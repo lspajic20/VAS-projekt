@@ -24,7 +24,7 @@ class PersonAgent(Agent):
             print(f"Person entered {current_room}")
 
             # Send "entered" message to LightAgent
-            msg = Message(to="agent1svjetlo@jabber.cz")  # Replace with LightAgent's JID
+            msg = Message(to="agent1svjetlo@jabber.cz")  
             msg.body = f"Person entered {current_room}"
             await self.send(msg)
 
