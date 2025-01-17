@@ -32,7 +32,7 @@ class LightAgent(Agent):
                         response = Message(to=str(msg.sender))
                         response.body = str(self.energy_usage)
                         await self.send(response)
-                        print(f"Energy data sent to {msg.sender}")
+                        print("Energy data sent to EnergyMonitorAgent")
 
         def turn_on_light(self, room):
             if self.room_states.get(room) != "ON":
