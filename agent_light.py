@@ -17,14 +17,22 @@ class LightAgent(Agent):
         async def run(self):
             msg = await self.receive(timeout=10)  # Wait for a message
             if msg:
-                room = msg.body.split(" ")[-1]  # Extract room name
-                print(f"LightAgent received: {msg.body}")
+                    print(f"LightAgent received: {msg.body}")
 
-                if "entered" in msg.body:
-                    self.turn_on_light(room)
+                    if "entered" in msg.body:
+                        room = msg.body.split(" ")[-1]
+                        self.turn_on_light(room)
 
-                elif "exited" in msg.body:
-                    self.turn_off_light(room)
+                    elif "exited" in msg.body:
+                        room = msg.body.split(" ")[-1]
+                        self.turn_off_light(room)
+
+                    elif msg.body == "Request energy data":
+                        # Send energy usage data to the requesting agent
+                        response = Message(to=str(msg.sender))
+                        response.body = str(self.energy_usage)
+                        await self.send(response)
+                        print(f"Energy data sent to {msg.sender}")
 
         def turn_on_light(self, room):
             if self.room_states.get(room) != "ON":
